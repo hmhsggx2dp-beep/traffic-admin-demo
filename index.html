@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>لوحة أبو عبدالله الإدارية - نسخة تعمل داخل الملفات</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111a2e; --card2:#0f1830;
+      --text:#eaf0ff; --muted:#9fb0d0; --line:rgba(255,255,255,.08);
+      --brand:#6ee7ff; --brand2:#8b5cf6; --ok:#34d399; --warn:#fbbf24; --bad:#fb7185;
+      --shadow: 0 18px 60px rgba(0,0,0,.35); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(110,231,255,.14), transparent 60%),
+        radial-gradient(1000px 500px at 85% 20%, rgba(139,92,246,.18), transparent 60%),
+        radial-gradient(900px 500px at 50% 90%, rgba(52,211,153,.10), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      padding: env(safe-area-inset-top) 14px env(safe-area-inset-bottom) 14px;
+    }
+    .app{max-width:1100px;margin:0 auto;}
+    .topbar{
+      position:sticky;top:0;z-index:10;
+      padding:12px 10px;
+      backdrop-filter:blur(14px);
+      background:linear-gradient(to bottom, rgba(11,18,32,.92), rgba(11,18,32,.65));
+      border-bottom:1px solid var(--line);
+    }
+    .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+    .brand{display:flex;gap:12px;align-items:center;}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:linear-gradient(135deg, rgba(110,231,255,.95), rgba(139,92,246,.95));
+      box-shadow:0 10px 30px rgba(110,231,255,.15);
+      display:grid;place-items:center;font-weight:900;color:#071021;
+    }
+    .title h1{margin:0;font-size:16px}
+    .title p{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
+    .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;border-radius:14px;font-size:13px;
+      cursor:pointer;user-select:none;
+      transition:.15s transform,.15s background;
+      display:flex;gap:8px;align-items:center;
+    }
+    .btn:hover{background:rgba(255,255,255,.09)}
+    .btn:active{transform:scale(.98)}
+    .btn.primary{border:none;background:linear-gradient(135deg, rgba(110,231,255,.95), rgba(139,92,246,.95));color:#071021;font-weight:800}
+    .pill{padding:6px 10px;border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--muted);background:rgba(255,255,255,.04)}
+    .grid{display:grid;grid-template-columns:280px 1fr;gap:14px;margin-top:14px}
+    @media (max-width:880px){.grid{grid-template-columns:1fr}}
+    .nav,.main{
+      background:rgba(17,26,46,.62);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .nav header,.main header{
+      padding:14px;border-bottom:1px solid var(--line);
+      background:linear-gradient(to bottom, rgba(255,255,255,.06), transparent);
+    }
+    .nav header .small{font-size:12px;color:var(--muted);margin-top:4px}
+    .nav .items{padding:10px}
+    .nav .item{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px;border-radius:14px;cursor:pointer;
+      border:1px solid transparent;transition:.15s background,.15s border;margin-bottom:6px;
+    }
+    .nav .item:hover{background:rgba(255,255,255,.06)}
+    .nav .item.active{background:rgba(110,231,255,.10);border-color:rgba(110,231,255,.18)}
+    .nav .left{display:flex;gap:10px;align-items:center}
+    .ico{
+      width:34px;height:34px;border-radius:12px;display:grid;place-items:center;
+      background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:16px;
+    }
+    .badge{
+      min-width:26px;height:22px;padding:0 8px;border-radius:999px;
+      display:grid;place-items:center;font-size:12px;
+      background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);
+    }
+    .badge.hot{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.22);color:#ffe7b0}
+    .badge.ok{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.22);color:#b7ffe2}
+    .main header h2{margin:0;font-size:16px}
+    .main header .sub{margin-top:4px;color:var(--muted);font-size:12px}
+    .content{padding:14px}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    @media (max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:540px){.cards{grid-template-columns:1fr}}
+    .kpi{
+      background:rgba(15,24,48,.75);
+      border:1px solid var(--line);
+      border-radius:18px;padding:12px;position:relative;overflow:hidden;
+    }
+    .kpi .label{font-size:12px;color:var(--muted)}
+    .kpi .value{font-size:22px;font-weight:900;margin-top:6px}
+    .kpi .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    .delta{font-size:12px;margin-top:8px;display:inline-flex;gap:6px;align-items:center}
+    .delta.up{color:var(--ok)} .delta.down{color:var(--bad)} .delta.flat{color:var(--warn)}
+    .split{display:grid;grid-template-columns:1.35fr .65fr;gap:10px;margin-top:12px}
+    @media (max-width:920px){.split{grid-template-columns:1fr}}
+    .panel{background:rgba(15,24,48,.75);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+    .panel header{padding:12px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03)}
+    .panel header h3{margin:0;font-size:14px}
+    .panel header .meta{font-size:12px;color:var(--muted)}
+    .panel .pbody{padding:12px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:middle}
+    th{color:var(--muted);font-weight:700}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;color:var(--muted);white-space:nowrap}
+    .tag.ok{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.10);color:#b7ffe2}
+    .tag.warn{border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.10);color:#ffe7b0}
+    .tag.bad{border-color:rgba(251,113,133,.25);background:rgba(251,113,133,.10);color:#ffd1db}
+    .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:720px){.formgrid{grid-template-columns:1fr}}
+    .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    .field input,.field select,.field textarea{
+      width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.05);color:var(--text);outline:none;
+    }
+    .field textarea{min-height:92px;resize:vertical}
+    .footnote{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.7}
+    .toast{
+      position:fixed;bottom:calc(env(safe-area-inset-bottom) + 14px);right:14px;left:14px;
+      max-width:520px;margin:0 auto;padding:12px 14px;border-radius:16px;
+      background:rgba(10,18,32,.90);border:1px solid var(--line);box-shadow:var(--shadow);
+      display:none;align-items:center;justify-content:space-between;gap:10px;z-index:99;backdrop-filter:blur(14px);
+    }
+    .toast.show{display:flex}
+    .toast .msg{font-size:13px}
+    .toast .x{cursor:pointer;color:var(--muted);padding:6px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+    .login{max-width:520px;margin:9vh auto 0;background:rgba(17,26,46,.62);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    .login header{padding:18px;border-bottom:1px solid var(--line);background:linear-gradient(135deg, rgba(110,231,255,.16), rgba(139,92,246,.14))}
+    .login header h2{margin:0;font-size:18px}
+    .login header p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.7}
+    .login .body{padding:16px 18px}
+    .kbd{display:inline-block;padding:3px 8px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:12px;color:var(--muted)}
+    .hintbox{margin-top:12px;padding:12px;border-radius:18px;border:1px dashed rgba(110,231,255,.25);background:rgba(110,231,255,.06);color:#dff9ff;font-size:12px;line-height:1.75}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    .errorbox{
+      max-width:820px;margin:22px auto 0;
+      background:rgba(251,113,133,.08);
+      border:1px solid rgba(251,113,133,.22);
+      border-radius:22px;padding:14px 16px;line-height:1.8;
+    }
+    .smallbtn{font-size:12px;padding:8px 10px;border-radius:12px}
+  </style>
+</head>
+<body>
+  <div class="app" id="app"></div>
+
+  <div class="toast" id="toast">
+    <div class="msg" id="toastMsg">تم</div>
+    <div class="x" onclick="Toast.hide()">تم</div>
+  </div>
+
+<script>
+/* ✅ نسخة “تشتغل داخل الملفات”:
+   - لو localStorage/sessionStorage مقفول (زي معاينة الملفات) ما يوقف التطبيق
+   - يصير تخزينه مؤقت (RAM) بدل ما ينهار
+*/
+
+const LS_KEY = "abuabdullah_admin_v2";
+
+/* ===== Safe storage wrapper ===== */
+function makeSafeStorage(which){
+  try{
+    const s = (which === "session") ? window.sessionStorage : window.localStorage;
+    const t = "__t";
+    s.setItem(t,"1"); s.removeItem(t);
+    return s;
+  }catch(e){
+    // fallback: in-memory store
+    const mem = {};
+    return {
+      getItem:(k)=> (k in mem ? mem[k] : null),
+      setItem:(k,v)=> { mem[k]=String(v); },
+      removeItem:(k)=> { delete mem[k]; }
+    };
+  }
+}
+const safeLocal = makeSafeStorage("local");
+const safeSession = makeSafeStorage("session");
+
+const nowISO = () => new Date().toISOString();
+const fmtSAR = (n) => new Intl.NumberFormat('ar-SA', {style:'currency', currency:'SAR', maximumFractionDigits:0}).format(n);
+
+const Seed = {
+  user: {name: "أبو عبدالله", company: "سلام النخبة", role:"المدير العام"},
+  approvals: [
+    {id:"APR-201", type:"طلب مشتريات", title:"قطع غيار كبينة", amount: 2850, requester:"م. إبراهيم", status:"معلق", createdAt: nowISO(), note:"مطلوب للتجربة"},
+    {id:"APR-202", type:"سلفة", title:"سلفة فني", amount: 700, requester:"أبو كريم", status:"موافق", createdAt: nowISO(), note:""},
+    {id:"APR-203", type:"تعهد", title:"استلام معدات", amount: 0, requester:"عبدالرحمن", status:"مرفوض", createdAt: nowISO(), note:"ناقص توقيع"}
+  ],
+  cash: [
+    {id:"C-01", kind:"دخل", title:"دفعة مشروع", amount: 45000, date: nowISO(), ref:"INV-1001"},
+    {id:"C-02", kind:"مصروف", title:"وقود ونثريات", amount: 520, date: nowISO(), ref:"EXP-44"},
+    {id:"C-03", kind:"مصروف", title:"مشتريات مواد", amount: 2850, date: nowISO(), ref:"APR-201"},
+  ],
+  invoices: [
+    {id:"INV-1001", client:"المرور", amount: 45000, status:"مدفوعة", date: nowISO()},
+    {id:"INV-1002", client:"أمانة", amount: 18000, status:"قيد التحصيل", date: nowISO()},
+  ],
+  tasks: [
+    {id:"T-11", title:"مراجعة طلب شرائح M2M", owner:"أبو عبدالله", due:"غدًا", status:"قيد التنفيذ"},
+    {id:"T-12", title:"تجهيز عرض المرور", owner:"إبراهيم", due:"هذا الأسبوع", status:"جديدة"},
+    {id:"T-13", title:"مطابقة مصروفات الشهر", owner:"أبو نايف", due:"نهاية الشهر", status:"جديدة"},
+  ]
+};
+
+function loadState(){
+  const raw = safeLocal.getItem(LS_KEY);
+  if(!raw){
+    safeLocal.setItem(LS_KEY, JSON.stringify(Seed));
+    return JSON.parse(JSON.stringify(Seed));
+  }
+  try { return JSON.parse(raw); } catch(e){
+    safeLocal.setItem(LS_KEY, JSON.stringify(Seed));
+    return JSON.parse(JSON.stringify(Seed));
+  }
+}
+function saveState(s){ safeLocal.setItem(LS_KEY, JSON.stringify(s)); }
+
+let state = loadState();
+
+const Toast = {
+  show(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(this._to);
+    this._to = setTimeout(()=>this.hide(), 2200);
+  },
+  hide(){ document.getElementById('toast').classList.remove('show'); }
+};
+
+function el(tag, attrs={}, children=[]){
+  const e = document.createElement(tag);
+  Object.entries(attrs).forEach(([k,v])=>{
+    if(k === "class") e.className = v;
+    else if(k === "html") e.innerHTML = v;
+    else if(k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v);
+  });
+  (Array.isArray(children)? children:[children]).forEach(c=>{
+    if(c===null || c===undefined) return;
+    if(typeof c === "string") e.appendChild(document.createTextNode(c));
+    else e.appendChild(c);
+  });
+  return e;
+}
+
+let current = "dashboard";
+function route(to){ current = to; renderApp(); }
+
+function countPending(){ return state.approvals.filter(a=>a.status==="معلق").length; }
+
+function kpiData(){
+  const income = state.cash.filter(x=>x.kind==="دخل").reduce((s,x)=>s+x.amount,0);
+  const expense = state.cash.filter(x=>x.kind==="مصروف").reduce((s,x)=>s+x.amount,0);
+  const pending = countPending();
+  const collecting = state.invoices.filter(i=>i.status!=="مدفوعة").reduce((s,i)=>s+i.amount,0);
+  return {income, expense, pending, collecting};
+}
+
+function renderTopbar(){
+  return el("div",{class:"topbar"},[
+    el("div",{class:"row"},[
+      el("div",{class:"brand"},[
+        el("div",{class:"logo"},["SN"]),
+        el("div",{class:"title"},[
+          el("h1",{html:`لوحة ${state.user.name} الإدارية`}),
+          el("p",{html:`${state.user.company} • ${state.user.role} • تعمل حتى داخل تطبيق الملفات`})
+        ])
+      ]),
+      el("div",{class:"actions"},[
+        el("span",{class:"pill"},[ safeLocal.getItem("__dummy")===null ? "جاهز" : "جاهز" ]),
+        el("button",{class:"btn", onclick:()=>Toast.show("تم تحديث اللوحة")},["تحديث"]),
+        el("button",{class:"btn primary", onclick:()=>openQuickAdd()},["إضافة سريعة"]),
+      ])
+    ])
+  ]);
+}
+
+function renderNav(){
+  const items = [
+    {id:"dashboard", name:"الرئيسية", icon:"🏠", badge:"ok", value:"جاهز"},
+    {id:"approvals", name:"الموافقات", icon:"✅", badge: countPending()? "hot":"ok", value: String(countPending())},
+    {id:"cash", name:"المالية", icon:"💳"},
+    {id:"invoices", name:"الفواتير", icon:"🧾"},
+    {id:"tasks", name:"المهام", icon:"📌"},
+    {id:"settings", name:"الإعدادات", icon:"⚙️"},
+  ];
+  return el("div",{class:"nav"},[
+    el("header",{},[
+      el("div",{style:"font-weight:800"},["الأقسام"]),
+      el("div",{class:"small"},[
+        "إذا ظهر لك قبل كذا صفحة فاضية: هذه نسخة محسنة.",
+        el("br"),"",
+        "كل شيء يحفظ تلقائيًا (ولو التخزين مقفول يصير مؤقت)."
+      ])
+    ]),
+    el("div",{class:"items"}, items.map(it=>{
+      return el("div",{class:"item "+(current===it.id?"active":""), onclick:()=>route(it.id)},[
+        el("div",{class:"left"},[
+          el("div",{class:"ico"},[it.icon]),
+          el("div",{},[
+            el("div",{style:"font-weight:800;font-size:13px"},[it.name]),
+            el("div",{style:"font-size:12px;color:var(--muted);margin-top:2px"},[
+              it.id==="approvals" ? "طلبات تنتظر اعتمادك" :
+              it.id==="cash" ? "دخل ومصروفات وتقارير" :
+              it.id==="invoices" ? "إصدار ومتابعة التحصيل" :
+              it.id==="tasks" ? "تنظيم العمل" :
+              it.id==="settings" ? "هوية وتخصيص" : "نظرة سريعة"
+            ])
+          ])
+        ]),
+        it.value ? el("div",{class:"badge "+(it.badge||"")},[it.value]) : el("div",{})
+      ])
+    }))
+  ]);
+}
+
+function renderMain(){
+  const title = ({
+    dashboard:"ملخص اليوم",
+    approvals:"الموافقات",
+    cash:"المالية",
+    invoices:"الفواتير",
+    tasks:"المهام",
+    settings:"الإعدادات"
+  })[current] || "لوحة";
+  const sub = ({
+    dashboard:"مؤشرات سريعة + آخر العمليات",
+    approvals:"اعتماد الطلبات أو رفضها مع ملاحظات",
+    cash:"إضافة دخل/مصروف وملخص",
+    invoices:"إنشاء فاتورة ومتابعة التحصيل",
+    tasks:"قائمة مهام بسيطة",
+    settings:"تعديل الاسم والهوية وإعادة ضبط البيانات"
+  })[current] || "";
+  return el("div",{class:"main"},[
+    el("header",{},[
+      el("div",{},[
+        el("h2",{},[title]),
+        el("div",{class:"sub"},[sub])
+      ]),
+      el("div",{style:"display:flex;gap:8px;align-items:center;flex-wrap:wrap"},[
+        el("span",{class:"pill"},["نسخة عرض عربية"]),
+        el("span",{class:"pill mono"},[new Date().toLocaleString('ar-SA')])
+      ])
+    ]),
+    el("div",{class:"content"},[ renderPage() ])
+  ]);
+}
+
+function renderDashboard(){
+  const k = kpiData();
+  const kpis = [
+    {label:"إجمالي الدخل", value: fmtSAR(k.income), hint:"مجموع الدخل المسجل", delta:{t:"ارتفاع", cls:"up", ico:"⬆️"}},
+    {label:"إجمالي المصروفات", value: fmtSAR(k.expense), hint:"مجموع المصروفات", delta:{t:"متابعة", cls:"flat", ico:"🟡"}},
+    {label:"طلبات معلقة", value: String(k.pending), hint:"تحتاج قرار منك", delta:{t: k.pending? "مهم":"تمام", cls: k.pending? "down":"up", ico: k.pending? "⚠️":"✅"}},
+    {label:"تحصيل متوقع", value: fmtSAR(k.collecting), hint:"فواتير غير مدفوعة", delta:{t:"قيد المتابعة", cls:"flat", ico:"🧾"}}
+  ];
+  const recent = [...state.cash].slice(-5).reverse();
+  return el("div",{},[
+    el("div",{class:"cards"}, kpis.map(x=>{
+      return el("div",{class:"kpi"},[
+        el("div",{class:"label"},[x.label]),
+        el("div",{class:"value"},[x.value]),
+        el("div",{class:"hint"},[x.hint]),
+        el("div",{class:"delta "+x.delta.cls},[x.delta.ico, x.delta.t])
+      ])
+    })),
+    el("div",{class:"split"},[
+      el("div",{class:"panel"},[
+        el("header",{},[
+          el("h3",{},["آخر العمليات المالية"]),
+          el("div",{class:"meta"},["آخر 5 حركات"])
+        ]),
+        el("div",{class:"pbody"},[
+          el("table",{},[
+            el("thead",{},[
+              el("tr",{},[
+                el("th",{},["النوع"]),
+                el("th",{},["الوصف"]),
+                el("th",{},["المبلغ"]),
+                el("th",{},["المرجع"])
+              ])
+            ]),
+            el("tbody",{}, recent.map(r=>{
+              const cls = r.kind==="دخل" ? "ok" : "warn";
+              return el("tr",{},[
+                el("td",{},[ el("span",{class:"tag "+cls},[r.kind]) ]),
+                el("td",{},[r.title]),
+                el("td",{},[fmtSAR(r.amount)]),
+                el("td",{},[r.ref || "-"])
+              ])
+            }))
+          ]),
+          el("div",{class:"footnote"},[
+            "ملاحظة: هذه نسخة تجريبية. لو التخزين مقفول في الآيفون، البيانات تكون مؤقتة وتروح إذا سكرت الصفحة."
+          ])
+        ])
+      ]),
+      el("div",{class:"panel"},[
+        el("header",{},[
+          el("h3",{},["طريقة العرض"]),
+          el("div",{class:"meta"},["مهم"])
+        ]),
+        el("div",{class:"pbody"},[
+          el("div",{class:"hintbox"},[
+            "إذا تبيها (كأيقونة تطبيق) لازم رابط ويب.",
+            el("br"),"",
+            "لكن لعرض الفكرة الآن: افتحها من الملفات وخلاص — هذه النسخة تشتغل هناك."
+          ]),
+          el("div",{style:"margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"},[
+            el("button",{class:"btn primary", onclick:()=>route('approvals')},["روح للموافقات"]),
+            el("button",{class:"btn", onclick:()=>route('cash')},["أضف مصروف"]),
+          ])
+        ])
+      ]),
+    ])
+  ]);
+}
+
+function renderApprovals(){
+  return el("div",{},[
+    el("div",{class:"panel"},[
+      el("header",{},[
+        el("h3",{},["طلبات تحتاج قرار"]),
+        el("div",{class:"meta"},[`معلق: ${countPending()}`])
+      ]),
+      el("div",{class:"pbody"},[
+        el("table",{},[
+          el("thead",{},[
+            el("tr",{},[
+              el("th",{},["رقم"]),
+              el("th",{},["النوع"]),
+              el("th",{},["العنوان"]),
+              el("th",{},["المبلغ"]),
+              el("th",{},["المقدم"]),
+              el("th",{},["الحالة"]),
+              el("th",{},["إجراء"])
+            ])
+          ]),
+          el("tbody",{}, state.approvals.map(a=>{
+            const tagCls = a.status==="موافق" ? "ok" : a.status==="مرفوض" ? "bad" : "warn";
+            return el("tr",{},[
+              el("td",{},[a.id]),
+              el("td",{},[a.type]),
+              el("td",{},[a.title]),
+              el("td",{},[fmtSAR(a.amount)]),
+              el("td",{},[a.requester]),
+              el("td",{},[ el("span",{class:"tag "+tagCls},[a.status]) ]),
+              el("td",{},[
+                el("button",{class:"btn", onclick:()=>openDecision(a.id)},["قرار"])
+              ])
+            ])
+          }))
+        ]),
+        el("div",{class:"footnote"},["اضغط قرار واكتب: موافق أو مرفوض أو معلق."])
+      ])
+    ])
+  ]);
+}
+
+function renderCash(){
+  const income = state.cash.filter(x=>x.kind==="دخل").reduce((s,x)=>s+x.amount,0);
+  const expense = state.cash.filter(x=>x.kind==="مصروف").reduce((s,x)=>s+x.amount,0);
+  return el("div",{},[
+    el("div",{class:"panel"},[
+      el("header",{},[
+        el("h3",{},["إضافة حركة مالية"]),
+        el("div",{class:"meta"},["سريع"])
+      ]),
+      el("div",{class:"pbody"},[
+        el("div",{class:"formgrid"},[
+          el("div",{class:"field"},[
+            el("label",{},["النوع"]),
+            el("select",{id:"cashKind"},[
+              el("option",{value:"دخل"},["دخل"]),
+              el("option",{value:"مصروف"},["مصروف"])
+            ])
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["المبلغ"]),
+            el("input",{id:"cashAmount", type:"number", placeholder:"مثال 1500"})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["الوصف"]),
+            el("input",{id:"cashTitle", type:"text", placeholder:"مثال وقود أو دفعة مشروع"})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["المرجع (اختياري)"]),
+            el("input",{id:"cashRef", type:"text", placeholder:"مثال INV-1003"})
+          ]),
+        ]),
+        el("div",{style:"margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"},[
+          el("button",{class:"btn primary", onclick:()=>addCash()},["حفظ الحركة"]),
+        ]),
+        el("div",{class:"footnote"},[`ملخص: الدخل ${fmtSAR(income)} • المصروفات ${fmtSAR(expense)}`])
+      ])
+    ])
+  ]);
+}
+
+function renderInvoices(){
+  return el("div",{},[
+    el("div",{class:"panel"},[
+      el("header",{},[
+        el("h3",{},["الفواتير"]),
+        el("div",{class:"meta"},["إنشاء ومتابعة"])
+      ]),
+      el("div",{class:"pbody"},[
+        el("div",{class:"formgrid"},[
+          el("div",{class:"field"},[
+            el("label",{},["العميل"]),
+            el("input",{id:"invClient", type:"text", placeholder:"مثال المرور"})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["المبلغ"]),
+            el("input",{id:"invAmount", type:"number", placeholder:"مثال 12000"})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["الحالة"]),
+            el("select",{id:"invStatus"},[
+              el("option",{value:"قيد التحصيل"},["قيد التحصيل"]),
+              el("option",{value:"مدفوعة"},["مدفوعة"]),
+              el("option",{value:"متأخرة"},["متأخرة"])
+            ])
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["ملاحظة (اختياري)"]),
+            el("input",{id:"invNote", type:"text", placeholder:"مثال دفعة أولى"})
+          ]),
+        ]),
+        el("div",{style:"margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"},[
+          el("button",{class:"btn primary", onclick:()=>addInvoice()},["إنشاء فاتورة"]),
+        ]),
+        el("div",{style:"margin-top:12px"},[
+          el("table",{},[
+            el("thead",{},[
+              el("tr",{},[
+                el("th",{},["رقم"]),
+                el("th",{},["العميل"]),
+                el("th",{},["المبلغ"]),
+                el("th",{},["الحالة"]),
+                el("th",{},["إجراء"])
+              ])
+            ]),
+            el("tbody",{}, state.invoices.map(i=>{
+              const cls = i.status==="مدفوعة" ? "ok" : i.status==="متأخرة" ? "bad" : "warn";
+              return el("tr",{},[
+                el("td",{},[i.id]),
+                el("td",{},[i.client]),
+                el("td",{},[fmtSAR(i.amount)]),
+                el("td",{},[ el("span",{class:"tag "+cls},[i.status]) ]),
+                el("td",{},[
+                  el("button",{class:"btn", onclick:()=>toggleInvoice(i.id)},["تغيير"])
+                ])
+              ])
+            }))
+          ])
+        ]),
+        el("div",{class:"footnote"},["تغيير = يدور بين قيد التحصيل ثم مدفوعة ثم متأخرة."])
+      ])
+    ])
+  ]);
+}
+
+function renderTasks(){
+  return el("div",{},[
+    el("div",{class:"panel"},[
+      el("header",{},[
+        el("h3",{},["المهام"]),
+        el("div",{class:"meta"},["خفيفة"])
+      ]),
+      el("div",{class:"pbody"},[
+        el("div",{class:"formgrid"},[
+          el("div",{class:"field"},[
+            el("label",{},["عنوان المهمة"]),
+            el("input",{id:"taskTitle", type:"text", placeholder:"مثال اعتماد مصروفات"})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["المسؤول"]),
+            el("input",{id:"taskOwner", type:"text", placeholder:"مثال أبو نايف"})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["الاستحقاق"]),
+            el("input",{id:"taskDue", type:"text", placeholder:"مثال غدًا"})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["الحالة"]),
+            el("select",{id:"taskStatus"},[
+              el("option",{value:"جديدة"},["جديدة"]),
+              el("option",{value:"قيد التنفيذ"},["قيد التنفيذ"]),
+              el("option",{value:"منتهية"},["منتهية"])
+            ])
+          ]),
+        ]),
+        el("div",{style:"margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"},[
+          el("button",{class:"btn primary", onclick:()=>addTask()},["إضافة مهمة"]),
+        ]),
+        el("div",{style:"margin-top:12px"},[
+          el("table",{},[
+            el("thead",{},[
+              el("tr",{},[
+                el("th",{},["رقم"]),
+                el("th",{},["المهمة"]),
+                el("th",{},["المسؤول"]),
+                el("th",{},["الاستحقاق"]),
+                el("th",{},["الحالة"]),
+                el("th",{},["إجراء"])
+              ])
+            ]),
+            el("tbody",{}, state.tasks.map(t=>{
+              const cls = t.status==="منتهية" ? "ok" : t.status==="قيد التنفيذ" ? "warn" : "";
+              return el("tr",{},[
+                el("td",{},[t.id]),
+                el("td",{},[t.title]),
+                el("td",{},[t.owner]),
+                el("td",{},[t.due]),
+                el("td",{},[ el("span",{class:"tag "+(cls||"")},[t.status]) ]),
+                el("td",{},[
+                  el("button",{class:"btn", onclick:()=>toggleTask(t.id)},["تغيير"])
+                ])
+              ])
+            }))
+          ])
+        ])
+      ])
+    ])
+  ]);
+}
+
+function renderSettings(){
+  return el("div",{},[
+    el("div",{class:"panel"},[
+      el("header",{},[
+        el("h3",{},["هوية اللوحة"]),
+        el("div",{class:"meta"},["تعديل فوري"])
+      ]),
+      el("div",{class:"pbody"},[
+        el("div",{class:"formgrid"},[
+          el("div",{class:"field"},[
+            el("label",{},["اسم المدير"]),
+            el("input",{id:"setName", type:"text", value: state.user.name})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["اسم الشركة"]),
+            el("input",{id:"setCompany", type:"text", value: state.user.company})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["المنصب"]),
+            el("input",{id:"setRole", type:"text", value: state.user.role})
+          ]),
+          el("div",{class:"field"},[
+            el("label",{},["المظهر"]),
+            el("select",{id:"setTheme"},[
+              el("option",{value:"dark"},["داكن"]),
+              el("option",{value:"mid"},["أزرق فخم"]),
+              el("option",{value:"ink"},["بنفسجي"])
+            ])
+          ]),
+        ]),
+        el("div",{style:"margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"},[
+          el("button",{class:"btn primary", onclick:()=>saveSettings()},["حفظ"]),
+          el("button",{class:"btn", onclick:()=>resetAll()},["إعادة ضبط"])
+        ]),
+        el("div",{class:"footnote"},["إعادة ضبط مفيدة قبل العرض لأبو عبدالله."])
+      ])
+    ])
+  ]);
+}
+
+function renderPage(){
+  if(current==="dashboard") return renderDashboard();
+  if(current==="approvals") return renderApprovals();
+  if(current==="cash") return renderCash();
+  if(current==="invoices") return renderInvoices();
+  if(current==="tasks") return renderTasks();
+  if(current==="settings") return renderSettings();
+  return el("div",{},["غير موجود"]);
+}
+
+/* ===== Actions ===== */
+function addCash(){
+  const kind = document.getElementById('cashKind').value;
+  const amount = Number(document.getElementById('cashAmount').value || 0);
+  const title = (document.getElementById('cashTitle').value || "").trim();
+  const ref = (document.getElementById('cashRef').value || "").trim();
+  if(!title || !amount){ Toast.show("اكتب الوصف والمبلغ"); return; }
+  const id = "C-" + Math.floor(1000 + Math.random()*9000);
+  state.cash.push({id, kind, title, amount, date: nowISO(), ref});
+  saveState(state);
+  Toast.show("تم حفظ الحركة");
+  route("dashboard");
+}
+function addInvoice(){
+  const client = (document.getElementById('invClient').value || "").trim();
+  const amount = Number(document.getElementById('invAmount').value || 0);
+  const status = document.getElementById('invStatus').value;
+  if(!client || !amount){ Toast.show("اكتب اسم العميل والمبلغ"); return; }
+  const id = "INV-" + Math.floor(1000 + Math.random()*9000);
+  state.invoices.unshift({id, client, amount, status, date: nowISO()});
+  saveState(state);
+  Toast.show("تم إنشاء الفاتورة");
+  route("invoices");
+}
+function toggleInvoice(id){
+  const i = state.invoices.find(x=>x.id===id);
+  if(!i) return;
+  i.status = (i.status==="قيد التحصيل") ? "مدفوعة" : (i.status==="مدفوعة" ? "متأخرة" : "قيد التحصيل");
+  saveState(state);
+  Toast.show("تم تحديث الحالة");
+  route("invoices");
+}
+function toggleTask(id){
+  const t = state.tasks.find(x=>x.id===id);
+  if(!t) return;
+  t.status = (t.status==="جديدة") ? "قيد التنفيذ" : (t.status==="قيد التنفيذ" ? "منتهية" : "جديدة");
+  saveState(state);
+  Toast.show("تم تحديث المهمة");
+  route("tasks");
+}
+function addTask(){
+  const title = (document.getElementById('taskTitle').value || "").trim();
+  const owner = (document.getElementById('taskOwner').value || "").trim();
+  const due = (document.getElementById('taskDue').value || "").trim();
+  const status = document.getElementById('taskStatus').value;
+  if(!title || !owner){ Toast.show("اكتب عنوان المهمة والمسؤول"); return; }
+  const id = "T-" + Math.floor(100 + Math.random()*900);
+  state.tasks.unshift({id, title, owner, due: due||"—", status});
+  saveState(state);
+  Toast.show("تمت إضافة المهمة");
+  route("tasks");
+}
+function openDecision(id){
+  const a = state.approvals.find(x=>x.id===id);
+  if(!a){Toast.show("غير موجود"); return;}
+  const note = prompt("اكتب ملاحظة (اختياري) ثم OK", a.note || "");
+  const action = prompt("اكتب: موافق أو مرفوض أو معلق", a.status);
+  if(!action) return;
+  const s = action.trim();
+  if(!["موافق","مرفوض","معلق"].includes(s)){ Toast.show("اكتب موافق أو مرفوض أو معلق"); return; }
+  a.status = s;
+  a.note = (note||"").trim();
+  saveState(state);
+  Toast.show("تم حفظ القرار");
+  route("approvals");
+}
+function openQuickAdd(){
+  const which = prompt("إضافة سريعة: اكتب (مصروف) أو (فاتورة) أو (مهمة)");
+  if(!which) return;
+  const w = which.trim();
+  if(w==="مصروف"){ route("cash"); setTimeout(()=>{ const k=document.getElementById('cashKind'); if(k) k.value="مصروف"; }, 50); }
+  else if(w==="فاتورة"){ route("invoices"); }
+  else if(w==="مهمة"){ route("tasks"); }
+  else Toast.show("اكتب مصروف أو فاتورة أو مهمة");
+}
+function saveSettings(){
+  const name = (document.getElementById('setName').value || "").trim();
+  const company = (document.getElementById('setCompany').value || "").trim();
+  const role = (document.getElementById('setRole').value || "").trim();
+  const theme = document.getElementById('setTheme').value;
+  if(name) state.user.name=name;
+  if(company) state.user.company=company;
+  if(role) state.user.role=role;
+
+  if(theme==="mid"){ document.documentElement.style.setProperty('--brand','#60a5fa'); document.documentElement.style.setProperty('--brand2','#22c55e'); }
+  else if(theme==="ink"){ document.documentElement.style.setProperty('--brand','#a78bfa'); document.documentElement.style.setProperty('--brand2','#6ee7ff'); }
+  else { document.documentElement.style.setProperty('--brand','#6ee7ff'); document.documentElement.style.setProperty('--brand2','#8b5cf6'); }
+
+  saveState(state);
+  Toast.show("تم حفظ الإعدادات");
+  renderApp();
+}
+function resetAll(){
+  if(!confirm("تأكيد إعادة الضبط؟")) return;
+  state = JSON.parse(JSON.stringify(Seed));
+  saveState(state);
+  Toast.show("تمت إعادة الضبط");
+  route("dashboard");
+}
+
+/* ===== App render with safe session ===== */
+function renderLogin(){
+  return el("div",{class:"login"},[
+    el("header",{},[
+      el("h2",{},["تطبيق إداري فخم"]),
+      el("p",{},[
+        "نسخة عربية تجريبية تعمل داخل تطبيق الملفات.",
+        el("br"),"",
+        "الدخول التجريبي: كلمة المرور ",
+        el("span",{class:"kbd mono"},["1234"])
+      ])
+    ]),
+    el("div",{class:"body"},[
+      el("div",{class:"field"},[
+        el("label",{},["كلمة المرور"]),
+        el("input",{id:"pw", type:"password", placeholder:"اكتب 1234"})
+      ]),
+      el("div",{style:"margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"},[
+        el("button",{class:"btn primary", onclick:()=>doLogin()},["دخول"]),
+        el("button",{class:"btn smallbtn", onclick:()=>{safeSession.setItem("logged_in","1"); renderApp(); Toast.show("تم تجاوز الدخول للعرض");}},["تجاوز"])
+      ]),
+      el("div",{class:"hintbox"},[
+        "لو ما اشتغل التخزين في جهازك، عادي — التطبيق يشتغل مؤقت.",
+        el("br"),"",
+        "إذا تبي تحفظ دائم وتضيف أيقونة: نرفع الملف لرابط ويب لاحقًا."
+      ])
+    ])
+  ]);
+}
+function doLogin(){
+  const pw = (document.getElementById('pw').value || "").trim();
+  if(pw==="1234"){
+    safeSession.setItem("logged_in","1");
+    Toast.show("هلا أبو عبدالله");
+    renderApp();
+  }else Toast.show("كلمة المرور غلط");
+}
+
+function renderApp(){
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  const logged = safeSession.getItem("logged_in")==="1";
+  if(!logged){
+    app.appendChild(renderLogin());
+    return;
+  }
+  app.appendChild(renderTopbar());
+  app.appendChild(el("div",{class:"grid"},[ renderNav(), renderMain() ]));
+}
+
+/* ===== Safety: show error if JS blocked completely ===== */
+try{
+  renderApp();
+}catch(err){
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  app.appendChild(el("div",{class:"errorbox"},[
+    el("div",{style:"font-weight:900;margin-bottom:6px"},["ما اشتغل التطبيق داخل المعاينة"]),
+    el("div",{},[
+      "حل سريع: افتح الملف من Safari (او ارفع الملف كرابط ويب).",
+      el("br"),"",
+      "الخطأ: ",
+      el("span",{class:"mono"},[String(err)])
+    ])
+  ]));
+}
+</script>
+</body>
+</html>
